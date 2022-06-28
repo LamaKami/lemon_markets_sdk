@@ -7,6 +7,9 @@ use serde::{Deserialize, de};
 #[derive(Debug)]
 pub struct LemonMarkets{
     pub account: Account,
+    pub orders: Orders,
+    pub positons: Positions,
+    pub venues: Venues,
     api_key: String,
     trading_url: String,
 }
@@ -14,7 +17,11 @@ pub struct LemonMarkets{
 impl LemonMarkets {
     pub fn new(api_key: String, trading_url: String) -> LemonMarkets{
         LemonMarkets{account: Account{trading_sub_url: trading_url.clone()+"account/", api_key: api_key.clone()}
-        , api_key, trading_url}
+        , api_key: api_key.clone(), trading_url: trading_url.clone(),
+        orders: Orders { trading_sub_url: trading_url.clone()+"orders/", api_key: api_key.clone()},
+        positons: Positions { trading_sub_url: trading_url.clone()+"positions/", api_key: api_key.clone()},
+        venues: Venues { trading_sub_url: "https://data.lemon.markets/v1/venues/".to_owned(), api_key: api_key.clone()}
+    }
     }
 }
 
@@ -24,6 +31,7 @@ pub struct Account{
     trading_sub_url: String,
     api_key: String
 }
+
 
 //TODO Error handeling for every function like token is not correct, etc.
 impl Account{
@@ -141,123 +149,187 @@ async fn post_request<T: de::DeserializeOwned>(url: &String, api_key: &str, body
 
 #[derive(Deserialize, Debug)]
 pub struct AccountInformation{
-    time: String,
-    mode: String,
-    status: String,
-    results: AccountResults
+    pub time: String,
+    pub mode: String,
+    pub status: String,
+    pub results: AccountResults
 }
 
 
 #[derive( Deserialize, Debug)]
 pub struct AccountResults{
-    created_at: String,
-    account_id: String,
-    firstname: String,
-    lastname: Option<String>,
-    email: String,
-    phone: Option<String>,
-    address: Option<String>,
-    billing_address: Option<String>,
-    billing_email: Option<String>,
-    billing_name: Option<String>,
-    billing_vat: Option<String>,
-    mode: String,
-    deposit_id: Option<String>,
-    client_id: Option<String>,
-    account_number: Option<String>,
-    iban_brokerage: Option<String>,
-    iban_origin: Option<String>,
-    bank_name_origin: Option<String>,
-    balance: i64, //(Your end-of-day balance from the day before) + (amount_sold_intraday) - (amount_bought_intraday) - (amount_open_withdrawals).
-    cash_to_invest: i64, //(balance) - (amount_open_orders)
-    cash_to_withdraw: i64, // (Your end-of-day balance from the day before) - (amount_bought_intraday) - (amount_open_withdrawals) - (amount_open_orders).
-    amount_bought_intraday: i64,
-    amount_sold_intraday: i64,
-    amount_open_orders: i64,
-    amount_open_withdrawals: i64,
-    amount_estimate_taxes: i64,
-    approved_at: Option<String>, //Time
-    trading_plan: String,
-    data_plan:String,
-    tax_allowance: Option<i64>,
-    tax_allowance_start: Option<String>,
-    tax_allowance_end: Option<String>
+    pub created_at: String,
+    pub account_id: String,
+    pub firstname: String,
+    pub lastname: Option<String>,
+    pub email: String,
+    pub phone: Option<String>,
+    pub address: Option<String>,
+    pub billing_address: Option<String>,
+    pub billing_email: Option<String>,
+    pub billing_name: Option<String>,
+    pub billing_vat: Option<String>,
+    pub mode: String,
+    pub deposit_id: Option<String>,
+    pub client_id: Option<String>,
+    pub account_number: Option<String>,
+    pub iban_brokerage: Option<String>,
+    pub iban_origin: Option<String>,
+    pub bank_name_origin: Option<String>,
+    pub balance: i64, //(Your end-of-day balance from the day before) + (amount_sold_intraday) - (amount_bought_intraday) - (amount_open_withdrawals).
+    pub cash_to_invest: i64, //(balance) - (amount_open_orders)
+    pub cash_to_withdraw: i64, // (Your end-of-day balance from the day before) - (amount_bought_intraday) - (amount_open_withdrawals) - (amount_open_orders).
+    pub amount_bought_intraday: i64,
+    pub amount_sold_intraday: i64,
+    pub amount_open_orders: i64,
+    pub amount_open_withdrawals: i64,
+    pub amount_estimate_taxes: i64,
+    pub approved_at: Option<String>, //Time
+    pub trading_plan: String,
+    pub data_plan:String,
+    pub tax_allowance: Option<i64>,
+    pub tax_allowance_start: Option<String>,
+    pub tax_allowance_end: Option<String>
 }
 
 
 #[derive(Deserialize, Debug)]
 pub struct Withdrawals{
-    time: String,
-    status: String,
-    mode: String,
-    results: Vec<WithdrawalResult>,
-    previous: Option<String>,
-    next: Option<String>,
-    total: i64,
-    page: i32,
-    pages: i32
+    pub time: String,
+    pub status: String,
+    pub mode: String,
+    pub results: Vec<WithdrawalResult>,
+    pub previous: Option<String>,
+    pub next: Option<String>,
+    pub total: i64,
+    pub page: i32,
+    pub pages: i32
 }
 
 #[derive(Deserialize, Debug)]
 pub struct WithdrawalResult{
-    id: String,
-    amount: i64,
-    created_at: String,
-    date: Option<String>,
-    idempotency: Option<String>,
+    pub id: String,
+    pub amount: i64,
+    pub created_at: String,
+    pub date: Option<String>,
+    pub idempotency: Option<String>,
 }
-
-
 
 #[derive(Deserialize, Debug)]
 pub struct Documents{
-    time: String,
-    status: String,
-    mode: String,
-    results: Vec<DocumentResult>,
+    pub time: String,
+    pub status: String,
+    pub mode: String,
+    pub results: Vec<DocumentResult>,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct DocumentResult{
-    id: String,
-    name: String,
-    created_at: String,
-    link: String,
-    viewed_first_at: String,
-    viewed_last_at: String
+    pub id: String,
+    pub name: String,
+    pub created_at: String,
+    pub link: String,
+    pub viewed_first_at: String,
+    pub viewed_last_at: String
 }
 
 
 #[derive(Deserialize, Debug)]
 pub struct BankStatements{
-    time: String,
-    status: String,
-    mode: String,
-    results: Vec<BankStatementResult>,
-    previous: Option<String>,
-    next: Option<String>,
-    total: i64,
-    page: i32,
-    pages: i32
+    pub time: String,
+    pub status: String,
+    pub mode: String,
+    pub results: Vec<BankStatementResult>,
+    pub previous: Option<String>,
+    pub next: Option<String>,
+    pub total: i64,
+    pub page: i32,
+    pub pages: i32
 }
 
 #[derive(Deserialize, Debug)]
 pub struct BankStatementResult{
-    id: String,
-    account_id: String,
+    pub id: String,
+    pub account_id: String,
     #[serde(alias = "type")]
-    type_name: String,
-    date: String,
-    amount: i64,
-    isin: Option<String>,
-    isin_title: Option<String>,
-    created_at: String,
-    quantity: Option<i64>
+    pub type_name: String,
+    pub date: String,
+    pub amount: i64,
+    pub isin: Option<String>,
+    pub isin_title: Option<String>,
+    pub created_at: String,
+    pub quantity: Option<i64>
 }
 
 #[derive(Deserialize, Debug)]
 pub struct WithdrawMoneyOk{
-    time: String,
-    status: String,
-    mode: String
+    pub time: String,
+    pub status: String,
+    pub mode: String
+}
+
+
+#[derive(Debug)]
+pub struct Orders{
+    trading_sub_url: String,
+    api_key: String
+}
+
+impl Orders {
+    
+}
+
+
+#[derive(Debug)]
+pub struct Positions{
+    trading_sub_url: String,
+    api_key: String
+}
+
+impl Positions {
+    
+}
+
+
+
+#[derive(Debug)]
+pub struct Venues{
+    trading_sub_url: String,
+    api_key: String
+}
+
+impl Venues {
+    pub async fn retireve_venues(&self) -> Result<VenueMarkets, reqwest::Error>{
+        println!("{}",&self.trading_sub_url);
+        let venue_markets: VenueMarkets = get_request(&self.trading_sub_url, &self.api_key, vec![]).await?;
+        Ok(venue_markets)
+    }
+}
+
+#[derive(Deserialize, Debug)]
+pub struct VenueMarkets{
+    pub time: String,
+    pub results: Vec<VenueResult>,
+    pub previous: Option<String>,
+    pub next: Option<String>,
+    pub total: i64,
+    pub page: i32,
+    pub pages: i32
+}
+
+#[derive(Deserialize, Debug)]
+pub struct VenueResult{
+    pub name: String,
+    pub title: String,
+    pub mic: String,
+    pub is_open: bool,
+    pub opening_hours: OpeningHours,
+    pub opening_days: Vec<String>
+}
+
+#[derive(Deserialize, Debug)]
+pub struct OpeningHours{
+    pub start: String,
+    pub end: String,
+    pub timezone: String
 }
